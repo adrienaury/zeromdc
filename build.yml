@@ -1,15 +1,6 @@
 default: "help"
 expose:
-  [
-    "help",
-    "info",
-    "promote",
-    "refresh",
-    "compile",
-    "lint",
-    "test",
-    "release",
-  ]
+  ["help", "info", "promote", "refresh", "compile", "lint", "test", "release"]
 
 properties:
   # Build Configuration (edit this section to override default values)
@@ -39,7 +30,7 @@ properties:
       "nosnakecase",
       "exhaustivestruct",
     ]
-  
+
 shell: ["zsh", "-c"]
 
 targets:
@@ -65,7 +56,7 @@ targets:
           print
           print -P "→ help"
           print -P "→ promote"
-          print -P "→ info → refresh ┰ compile
+          print -P "→ info → refresh ┰ compile"
           print -P "                 ┖ lint → test → release"
 
   info:
