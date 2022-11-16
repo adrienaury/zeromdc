@@ -2,7 +2,7 @@ FROM adrienaury/go-devcontainer:v1.0
 
 USER root
 
-RUN apk add --update --progress --no-cache make gomplate
+RUN apk add --update --progress --no-cache make
 
 ARG VERSION_GOLICENSE=0.2.0
 ARG VERSION_MILLER=6.2.0

@@ -1,4 +1,4 @@
-module github.com/adrienaury/go-template
+module github.com/adrienaury/zeromdc
 
 go 1.19
 
