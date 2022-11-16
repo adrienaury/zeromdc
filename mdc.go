@@ -65,3 +65,9 @@ func (m *MdcAdapter) GetString(key string) string {
 
 	return fmt.Sprintf("%v", value)
 }
+
+func (m *MdcAdapter) Remove(key string) {
+	m.Lock()
+	delete(m.items, key)
+	m.Unlock()
+}
