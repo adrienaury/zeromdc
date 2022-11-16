@@ -1,6 +1,5 @@
 default: "help"
-expose:
-  ["help", "info", "promote", "refresh", "compile", "lint", "test", "release"]
+expose: ["help", "info", "promote", "refresh", "compile", "lint", "test"]
 
 properties:
   # Build Configuration (edit this section to override default values)
@@ -37,7 +36,6 @@ targets:
   help:
     doc: "Print this message"
     steps:
-      # - $: 'neon -info' => incorrect order, issue to open
       - $: |
           print -P "%BAvailable targets%b"
           print
@@ -48,7 +46,6 @@ targets:
           print -P "%B%F{blue}compile%f%b      Compile binary files locally [info->refresh]"
           print -P "%B%F{blue}lint%f%b         Examine source code and report suspicious constructs [info->refresh]"
           print -P "%B%F{blue}test%f%b         Run all tests with coverage [info->refresh->lint]"
-          print -P "%B%F{blue}release%f%b      Compile binary files for production [info->refresh->lint->test]"
           print
           print -P "%BExample:%b neon promote release"
           print
@@ -57,7 +54,7 @@ targets:
           print -P "→ help"
           print -P "→ promote"
           print -P "→ info → refresh ┰ compile"
-          print -P "                 ┖ lint → test → release"
+          print -P "                 ┖ lint → test"
 
   info:
     doc: "Print build informations"
@@ -156,24 +153,12 @@ targets:
           - $: "go mod init ={mod}"
       - $: "go mod tidy"
 
-  # run "neon -props '{buildpaths: ["path/to/main/package1","path/to/main/package2"]}' compile" to compile specific targets
-  # example : neon -props '{buildpaths: ["cmd/cli"]}' compile
   compile:
     doc: "Compile binary files locally"
     depends: ["info", "refresh"]
     steps:
       - ldflags = ldflags + " -X main.version=" + tag + " -X main.commit=" + commit + " -X main.buildDate=" + date + " -X main.builtBy=" + by
-      - if: len(buildpaths) == 0
-        then:
-          - buildpaths = appendpath("cmd", find("cmd", "*"))
-      - for: path
-        in: buildpaths
-        do:
-          - print: Building ={path}
-          - |
-            pathcomponents = split(unixpath(path), "/")
-            name = pathcomponents[len(pathcomponents)-1]
-          - $: go build -ldflags "-X main.name=={name} ={ldflags} ={LDFLAGS}" -o ./={BUILD_DIR}/={name} ./={path}
+      - $: go build -ldflags "={ldflags} ={LDFLAGS}" -o ./={BUILD_DIR}/lib .
 
   lint:
     doc: "Examine source code and report suspicious constructs"
@@ -192,12 +177,3 @@ targets:
     depends: ["info", "refresh", "lint"]
     steps:
       - $: go test -coverprofile=./={BUILD_DIR}/coverage.txt -covermode=atomic ./...
-
-  # run "neon -props '{buildpaths: ["path/to/main/package1","path/to/main/package2"]}' release" to release specific targets
-  # example : neon -props '{buildpaths: ["cmd/cli"]}' release
-  release:
-    doc: "Compile binary files for production"
-    depends: ["info", "refresh", "lint", "test"]
-    steps:
-      - ldflags = ldflags + " -s -w" # Omit the DWARF symbol table. Omit the symbol table and debug information.
-      - call: compile

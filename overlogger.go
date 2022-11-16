@@ -5,7 +5,7 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var overLogger *Overlog
+var overLogger *Overlog //nolint:gochecknoglobals
 
 type Overlog struct {
 	log *zerolog.Logger

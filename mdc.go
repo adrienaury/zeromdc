@@ -6,8 +6,8 @@ import (
 )
 
 var (
-	_globalMdc  = InitGlobalMdcAdapter()
-	_MdcAdapter *MdcAdapter
+	_globalMdc  = InitGlobalMdcAdapter() //nolint:gochecknoglobals
+	_MdcAdapter *MdcAdapter              //nolint:gochecknoglobals
 )
 
 type MdcAdapter struct {

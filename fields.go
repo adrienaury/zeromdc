@@ -1,6 +1,6 @@
 package zeromdc
 
-var _globalFields = make([]string, 0)
+var _globalFields = make([]string, 0) //nolint:gochecknoglobals
 
 func SetGlobalFields(fields []string) {
 	_globalFields = fields
