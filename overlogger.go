@@ -8,7 +8,7 @@ import (
 var overLogger *Overlog //nolint:gochecknoglobals
 
 type Overlog struct {
-	log *zerolog.Logger
+	*zerolog.Logger
 }
 
 func New(logger zerolog.Logger) *Overlog {
@@ -18,8 +18,12 @@ func New(logger zerolog.Logger) *Overlog {
 	ClearGlobalFields()
 
 	overLogger = &Overlog{
-		log: &log.Logger,
+		Logger: &log.Logger,
 	}
 
+	return overLogger
+}
+
+func Log() *Overlog {
 	return overLogger
 }
