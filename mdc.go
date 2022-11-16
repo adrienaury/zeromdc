@@ -1,17 +1,9 @@
 package zeromdc
 
 import (
-	"strconv"
+	"fmt"
 	"sync"
 )
-
-// value, exists := over.MDC().Get("stats")
-// over.MDC().Set("stats", &stats{CreatedLinesCount: map[string]int{}, DeletedLinesCount: map[string]int{}})
-// over.MDC().Set("action", "pull")
-// over.MDC().Set("action", "push")
-// over.SetGlobalFields([]string{"action"})
-// over.MDC().Set("workerid", id)
-// stats, ok := over.MDC().Get("stats")
 
 var (
 	_globalMdc  = InitGlobalMdcAdapter()
@@ -19,19 +11,25 @@ var (
 )
 
 type MdcAdapter struct {
-	items map[string]any
+	items map[string]interface{}
 	sync.RWMutex
 }
 
 func InitGlobalMdcAdapter() *MdcAdapter {
 	if _MdcAdapter == nil {
 		_MdcAdapter = &MdcAdapter{
-			items:   make(map[string]any),
+			items:   make(map[string]interface{}),
 			RWMutex: sync.RWMutex{},
 		}
 	}
 
 	return _MdcAdapter
+}
+
+func ResetGlobalMdcAdapter() {
+	_MdcAdapter.RLock()
+	_MdcAdapter.items = make(map[string]interface{})
+	_MdcAdapter.RUnlock()
 }
 
 func MDC() *MdcAdapter {
@@ -42,17 +40,28 @@ func MDC() *MdcAdapter {
 	return s
 }
 
-func (m *MdcAdapter) Get(key string) (any, bool) {
-	uniqueKey := m.getUniqueKey(key)
+func (m *MdcAdapter) Set(key string, value interface{}) {
+	m.Lock()
+	m.items[key] = value
+	m.Unlock()
+}
+
+func (m *MdcAdapter) Get(key string) (interface{}, bool) {
 	m.RLock()
-	v, ok := m.items[uniqueKey]
+	v, ok := m.items[key]
 	m.RUnlock()
+
 	return v, ok
 }
 
-func (m *MdcAdapter) getUniqueKey(key string) string {
-	if key == "" {
-		panic("MDC key cannot be empty")
+func (m *MdcAdapter) GetString(key string) string {
+	m.RLock()
+	value, ok := m.items[key]
+	m.RUnlock()
+
+	if !ok {
+		value = ""
 	}
-	return key + "-" + strconv.FormatUint(GetGoroutineID(), 10)
+
+	return fmt.Sprintf("%v", value)
 }
