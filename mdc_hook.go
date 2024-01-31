@@ -9,7 +9,7 @@ func (m MDCHook) Run(event *zerolog.Event, level zerolog.Level, message string) 
 		return
 	}
 
-	fields := make(map[string]interface{})
+	fields := make(map[string]interface{}, len(_globalFields))
 	for _, field := range _globalFields {
 		fields[field] = MDC().GetString(field)
 	}
