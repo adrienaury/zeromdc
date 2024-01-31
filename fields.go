@@ -21,6 +21,7 @@ func GetGlobalFields() []string {
 func AddGlobalFields(field string) {
 	if _, exist := _uniqueness[field]; !exist {
 		_globalFields = append(_globalFields, field)
+		_uniqueness[field] = nil
 	}
 }
 
